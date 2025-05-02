@@ -16,7 +16,7 @@ public class Mago {
         this.modoDeJuego = modoDeJuego;
         this.puntajeJugador = new HashMap<>();
         this.diccionario = new Diccionario(modoDeJuego);
-        this.letrasActuales = new HashSet<>(); // Inicializa aquí
+        this.letrasActuales = new HashSet<>();
 
         try {
             diccionario.loadFromFile("src/Diccionario.txt");
@@ -26,13 +26,11 @@ public class Mago {
         }
 
         jugadores.forEach(p -> puntajeJugador.put(p, 0));
-        prepararNuevaRonda(); // Genera las primeras letras
+        prepararNuevaRonda();
     }
 
     public Set<Character> getLetrasActuales() {
-        return letrasActuales != null ?
-                Collections.unmodifiableSet(letrasActuales) :
-                Collections.emptySet();
+        return Collections.unmodifiableSet(letrasActuales);
     }
 
     public HashMap<String, Integer> getPuntuaciones() {
@@ -54,14 +52,17 @@ public class Mago {
     public void prepararNuevaRonda() {
         letrasActuales = generarLetras(10);
         palabrasUsadas.clear();
-        jugadorActual = 0;
     }
 
     public void iniciarJuego() {
-        prepararNuevaRonda(); // Esto genera las letras iniciales
+        prepararNuevaRonda();
     }
 
     public ResultadoPalabra procesarPalabra(String jugador, String palabraInput) {
+        if (!jugador.equals(getJugadorActual())) {
+            return new ResultadoPalabra(false, "No es tu turno", 0);
+        }
+
         String palabra = palabraInput.toUpperCase();
 
         if (palabrasUsadas.contains(palabra)) {
@@ -84,12 +85,11 @@ public class Mago {
         int puntos = diccionario.obtenerPuntos(palabra);
         puntajeJugador.merge(jugador, puntos, Integer::sum);
 
-        siguienteTurno();
-
         return new ResultadoPalabra(true, "Palabra válida", puntos);
     }
 
     public void pasarTurno() {
+        palabrasUsadas.clear();
         siguienteTurno();
     }
 
@@ -104,7 +104,6 @@ public class Mago {
         }
     }
 
-    // Clase interna para resultados
     public static class ResultadoPalabra {
         public final boolean valida;
         public final String mensaje;
@@ -117,7 +116,6 @@ public class Mago {
         }
     }
 
-    // Métodos existentes modificados
     private boolean letrasValidas(String palabra) {
         for (char letra : palabra.toCharArray()) {
             if (!letrasActuales.contains(Character.toUpperCase(letra))) {
@@ -151,6 +149,7 @@ public class Mago {
             char c = fuenteConsonantes.charAt(random.nextInt(fuenteConsonantes.length()));
             letras.add(c);
         }
+
         return letras;
     }
 }

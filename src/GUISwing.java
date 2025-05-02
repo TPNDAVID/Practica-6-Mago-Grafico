@@ -11,8 +11,9 @@ public class GUISwing {
     private Mago mago;
     private List<String> jugadores;
     private int modoJuego;
-    private int jugadorActual = 0;
-    private int rondaActual = 1;
+    private JPanel letrasPanel;
+    private JLabel lblJugador;
+    private JLabel lblRonda;
 
     public GUISwing() {
         crearPantallaInicial();
@@ -26,12 +27,10 @@ public class GUISwing {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Título
         JLabel titulo = new JLabel("MAGO DE PALABRAS", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
         panel.add(titulo, BorderLayout.NORTH);
 
-        // Botón de inicio
         JButton btnIniciar = new JButton("Iniciar Juego");
         btnIniciar.setPreferredSize(new Dimension(150, 40));
         btnIniciar.addActionListener(e -> mostrarConfiguracionJugadores());
@@ -45,7 +44,6 @@ public class GUISwing {
         JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Configuración básica
         panel.add(new JLabel("Número de jugadores (2-4):"));
         JTextField txtJugadores = new JTextField();
         panel.add(txtJugadores);
@@ -61,7 +59,6 @@ public class GUISwing {
         panelModo.add(rbExperto);
         panel.add(panelModo);
 
-        // Botón continuar
         JButton btnContinuar = new JButton("Continuar");
         btnContinuar.addActionListener(e -> {
             try {
@@ -115,7 +112,6 @@ public class GUISwing {
 
     private void iniciarJuego() {
         mago = new Mago(jugadores, modoJuego);
-        mago.iniciarJuego(); // Asegura que las letras estén generadas
         mostrarPantallaJuego();
     }
 
@@ -125,13 +121,15 @@ public class GUISwing {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Panel superior - Información
+        // Panel superior
         JPanel topPanel = new JPanel(new FlowLayout());
-        topPanel.add(new JLabel("Ronda: " + rondaActual + "/3"));
-        topPanel.add(new JLabel("Turno: " + jugadores.get(jugadorActual)));
+        lblRonda = new JLabel("Ronda: " + mago.getRondaActual() + "/3");
+        lblJugador = new JLabel("Turno de: " + mago.getJugadorActual());
+        topPanel.add(lblRonda);
+        topPanel.add(lblJugador);
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Panel central - Letras y entrada
+        // Panel central
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -139,32 +137,47 @@ public class GUISwing {
         lblLetras.setAlignmentX(Component.CENTER_ALIGNMENT);
         centerPanel.add(lblLetras);
 
-        JPanel letrasPanel = new JPanel();
-        for (Character letra : mago.getLetrasActuales()) {
-            JLabel lbl = new JLabel(String.valueOf(letra));
-            lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            lbl.setFont(new Font("Arial", Font.BOLD, 24));
-            letrasPanel.add(lbl);
-        }
+        letrasPanel = new JPanel();
+        actualizarLetras();
         centerPanel.add(letrasPanel);
 
         inputField = new JTextField(20);
         inputField.setMaximumSize(new Dimension(300, 30));
         centerPanel.add(inputField);
 
-        JButton btnEnviar = new JButton("Enviar");
+        JPanel buttonPanel = new JPanel();
+        JButton btnEnviar = new JButton("Enviar palabra");
         btnEnviar.addActionListener(this::procesarPalabra);
-        centerPanel.add(btnEnviar);
+
+        JButton btnPasar = new JButton("Pasar turno");
+        btnPasar.addActionListener(e -> pasarTurno());
+
+        buttonPanel.add(btnEnviar);
+        buttonPanel.add(btnPasar);
+        centerPanel.add(buttonPanel);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Panel inferior - Información
-        infoArea = new JTextArea(5, 30);
+        // Panel inferior
+        infoArea = new JTextArea(8, 30);
         infoArea.setEditable(false);
         mainPanel.add(new JScrollPane(infoArea), BorderLayout.SOUTH);
 
         frame.add(mainPanel);
         frame.revalidate();
+        frame.repaint();
+    }
+
+    private void actualizarLetras() {
+        letrasPanel.removeAll();
+        for (Character letra : mago.getLetrasActuales()) {
+            JLabel lbl = new JLabel(String.valueOf(letra));
+            lbl.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+            lbl.setFont(new Font("Arial", Font.BOLD, 24));
+            letrasPanel.add(lbl);
+        }
+        letrasPanel.revalidate();
+        letrasPanel.repaint();
     }
 
     private void procesarPalabra(ActionEvent e) {
@@ -174,38 +187,45 @@ public class GUISwing {
             return;
         }
 
-        String jugador = jugadores.get(jugadorActual);
-        mago.procesarPalabra(jugador, palabra);
-        actualizarInfo("Jugador " + jugador + ": " + palabra);
+        Mago.ResultadoPalabra resultado = mago.procesarPalabra(mago.getJugadorActual(), palabra);
 
-        siguienteTurno();
-    }
-
-    private void siguienteTurno() {
-        jugadorActual++;
-        if (jugadorActual >= jugadores.size()) {
-            jugadorActual = 0;
-            rondaActual++;
-
-            if (rondaActual > 3) {
-                mostrarResultados();
-                return;
-            }
-
-            mago.prepararNuevaRonda();
-            actualizarInfo("\n--- COMIENZA RONDA " + rondaActual + " ---");
+        String mensaje = mago.getJugadorActual() + " escribió: '" + palabra + "' - ";
+        if (resultado.valida) {
+            mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
+        } else {
+            mensaje += "INVÁLIDA (" + resultado.mensaje + ", " + resultado.puntos + " puntos)";
         }
+        actualizarInfo(mensaje);
 
-        mostrarPantallaJuego();
+        inputField.setText("");
+        actualizarInfo("Puntuaciones: " + mago.getPuntuaciones());
+        actualizarLetras();
+
+        // Actualizar información del turno
+        lblJugador.setText("Turno de: " + mago.getJugadorActual());
+        lblRonda.setText("Ronda: " + mago.getRondaActual() + "/3");
     }
 
-    private void mostrarResultados() {
+    private void pasarTurno() {
+        mago.pasarTurno();
+        actualizarInfo(mago.getJugadorActual() + " ha pasado su turno");
+
+        if (mago.esFinalDelJuego()) {
+            mostrarResultadosFinales();
+        } else {
+            actualizarLetras();
+            lblJugador.setText("Turno de: " + mago.getJugadorActual());
+            lblRonda.setText("Ronda: " + mago.getRondaActual() + "/3");
+            inputField.setText("");
+        }
+    }
+
+    private void mostrarResultadosFinales() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(new JLabel("RESULTADOS FINALES"));
+        panel.add(new JLabel("RESULTADOS FINALES", SwingConstants.CENTER));
 
-        // Ordenar jugadores por puntaje
         List<Map.Entry<String, Integer>> resultados = new ArrayList<>(mago.getPuntuaciones().entrySet());
         resultados.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
@@ -215,7 +235,7 @@ public class GUISwing {
 
         JOptionPane.showMessageDialog(frame, panel, "Juego Terminado", JOptionPane.INFORMATION_MESSAGE);
         frame.dispose();
-        new GUISwing(); // Reiniciar juego
+        new GUISwing();
     }
 
     private void actualizarInfo(String mensaje) {
