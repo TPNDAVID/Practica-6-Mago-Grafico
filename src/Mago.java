@@ -8,6 +8,7 @@ public class Mago {
     private List<String> jugadores;
     private Set<Character> letrasActuales;
     private Set<String> palabrasUsadas = new HashSet<>();
+    private Set<String> jugadoresQuePasaron = new HashSet<>();
     private int jugadorActual = 0;
     private int rondaActual = 1;
 
@@ -60,44 +61,48 @@ public class Mago {
         }
 
         String palabra = palabraInput.toUpperCase();
+        ResultadoPalabra resultado;
 
         if (palabrasUsadas.contains(palabra)) {
-            return new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0);
-        }
-
-        if (!letrasValidas(palabra)) {
+            resultado = new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0);
+        } else if (!letrasValidas(palabra)) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
             puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            return new ResultadoPalabra(false, "Letras no válidas", penalizacion);
-        }
-
-        if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
+            resultado = new ResultadoPalabra(false, "Letras no válidas", penalizacion);
+        } else if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
             puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            return new ResultadoPalabra(false, "Palabra no válida", penalizacion);
+            resultado = new ResultadoPalabra(false, "Palabra no válida", penalizacion);
+        } else {
+            palabrasUsadas.add(palabra);
+            int puntos = diccionario.obtenerPuntos(palabra);
+            puntajeJugador.merge(jugador, puntos, Integer::sum);
+            resultado = new ResultadoPalabra(true, "Palabra válida", puntos);
         }
 
-        palabrasUsadas.add(palabra);
-        int puntos = diccionario.obtenerPuntos(palabra);
-        puntajeJugador.merge(jugador, puntos, Integer::sum);
-
-        return new ResultadoPalabra(true, "Palabra válida", puntos);
-    }
-
-    public void pasarTurno() {
-        palabrasUsadas.clear();
         siguienteTurno();
+
+        return resultado;
     }
 
-    private void siguienteTurno() {
-        jugadorActual++;
-        if (jugadorActual >= jugadores.size()) {
-            jugadorActual = 0;
+    public boolean pasarTurno() {
+        jugadoresQuePasaron.add(jugadores.get(jugadorActual));
+
+        siguienteTurno();
+
+        if (jugadoresQuePasaron.size() >= jugadores.size()) {
+            jugadoresQuePasaron.clear();
             rondaActual++;
             if (!esFinalDelJuego()) {
                 prepararNuevaRonda();
             }
+            return true;
         }
+        return false;
+    }
+
+    private void siguienteTurno() {
+        jugadorActual = (jugadorActual + 1) % jugadores.size();
     }
 
     public static class ResultadoPalabra {
