@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
-public class GUISwing {
+public class ConsolaGrafica {
     private JFrame frame;
     private JTextArea infoArea;
     private JTextField inputField;
@@ -15,7 +15,7 @@ public class GUISwing {
     private JLabel lblJugador;
     private JLabel lblRonda;
 
-    public GUISwing() {
+    public ConsolaGrafica() {
         crearPantallaInicial();
     }
 
@@ -32,7 +32,7 @@ public class GUISwing {
         panel.add(titulo, BorderLayout.NORTH);
 
         JButton btnIniciar = new JButton("Iniciar Juego");
-        btnIniciar.setPreferredSize(new Dimension(150, 40));
+        btnIniciar.setPreferredSize(new Dimension(40, 40));
         btnIniciar.addActionListener(e -> mostrarConfiguracionJugadores());
 
         panel.add(btnIniciar, BorderLayout.CENTER);
@@ -235,7 +235,7 @@ public class GUISwing {
 
         JOptionPane.showMessageDialog(frame, panel, "Juego Terminado", JOptionPane.INFORMATION_MESSAGE);
         frame.dispose();
-        new GUISwing();
+        new ConsolaGrafica();
     }
 
     private void actualizarInfo(String mensaje) {
@@ -243,6 +243,6 @@ public class GUISwing {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(GUISwing::new);
+        SwingUtilities.invokeLater(ConsolaGrafica::new);
     }
 }
