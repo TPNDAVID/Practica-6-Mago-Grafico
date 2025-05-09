@@ -82,43 +82,110 @@ public class ConsolaGrafica {
     }
 
     private void mostrarConfiguracionJugadores() {
-        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panelPrincipal = new JPanel();
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
-        panel.add(new JLabel("Número de jugadores (2-4):"));
+        JLabel lblTitulo = new JLabel("CONFIGURACIÓN DEL JUEGO", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 28));
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelPrincipal.add(lblTitulo);
+        panelPrincipal.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        JPanel panelJugadores = new JPanel();
+        panelJugadores.setLayout(new BoxLayout(panelJugadores, BoxLayout.Y_AXIS));
+        panelJugadores.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelJugadores.setMaximumSize(new Dimension(350, 100));
+
+        JLabel lblNumJugadores = new JLabel("Número de jugadores (2-4)", SwingConstants.CENTER);
+        lblNumJugadores.setFont(new Font("Arial", Font.BOLD, 22));
+        lblNumJugadores.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelJugadores.add(lblNumJugadores);
+        panelJugadores.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Campo de texto
         JTextField txtJugadores = new JTextField();
-        panel.add(txtJugadores);
+        txtJugadores.setFont(new Font("Arial", Font.PLAIN, 20));
+        txtJugadores.setHorizontalAlignment(JTextField.CENTER);
+        txtJugadores.setMaximumSize(new Dimension(150, 35));
+        txtJugadores.setAlignmentX(Component.CENTER_ALIGNMENT);
+        txtJugadores.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(150, 150, 150)),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
+        panelJugadores.add(txtJugadores);
+        panelPrincipal.add(panelJugadores);
+        panelPrincipal.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        panel.add(new JLabel("Modo de juego:"));
         JPanel panelModo = new JPanel();
+        panelModo.setLayout(new BoxLayout(panelModo, BoxLayout.Y_AXIS));
+        panelModo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelModo.setMaximumSize(new Dimension(350, 120));
+
+        JLabel lblModoJuego = new JLabel("Modo de juego", SwingConstants.CENTER);
+        lblModoJuego.setFont(new Font("Arial", Font.BOLD, 22));
+        lblModoJuego.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelModo.add(lblModoJuego);
+        panelModo.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        JPanel panelRadios = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+        panelRadios.setOpaque(false);
+
         ButtonGroup grupoModo = new ButtonGroup();
+
+        // Radio button Regular
         JRadioButton rbRegular = new JRadioButton("Regular", true);
+        rbRegular.setFont(new Font("Arial", Font.PLAIN, 20));
+        rbRegular.setBackground(new Color(240, 240, 240)); // Fondo claro
+        rbRegular.setFocusPainted(false);
+
+        // Radio button Experto
         JRadioButton rbExperto = new JRadioButton("Experto");
+        rbExperto.setFont(new Font("Arial", Font.PLAIN, 20));
+        rbExperto.setBackground(new Color(240, 240, 240));
+        rbExperto.setFocusPainted(false);
+
         grupoModo.add(rbRegular);
         grupoModo.add(rbExperto);
-        panelModo.add(rbRegular);
-        panelModo.add(rbExperto);
-        panel.add(panelModo);
 
-        JButton btnContinuar = new JButton("Continuar");
+        panelRadios.add(rbRegular);
+        panelRadios.add(rbExperto);
+
+        panelModo.add(panelRadios);
+        panelPrincipal.add(panelModo);
+        panelPrincipal.add(Box.createRigidArea(new Dimension(0, 40)));
+
+        JButton btnContinuar = new JButton("CONTINUAR");
+        btnContinuar.setFont(new Font("Arial", Font.BOLD, 22));
+        btnContinuar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnContinuar.setMaximumSize(new Dimension(250, 50));
+        btnContinuar.setBackground(new Color(251, 181, 45));
+        btnContinuar.setForeground(Color.WHITE);
+        btnContinuar.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        btnContinuar.setFocusPainted(false);
+
         btnContinuar.addActionListener(e -> {
             try {
                 int numJugadores = Integer.parseInt(txtJugadores.getText());
                 if (numJugadores < 2 || numJugadores > 4) {
-                    JOptionPane.showMessageDialog(frame, "Deben ser entre 2 y 4 jugadores");
+                    JOptionPane.showMessageDialog(frame, "Deben ser entre 2 y 4 jugadores", "Error", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 modoJuego = rbRegular.isSelected() ? 1 : 2;
                 mostrarIngresoNombres(numJugadores);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Ingresa un número válido");
+                JOptionPane.showMessageDialog(frame, "Ingrese un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+                txtJugadores.setText("");
+                txtJugadores.requestFocus();
             }
         });
 
+        panelPrincipal.add(btnContinuar);
+
         frame.getContentPane().removeAll();
-        frame.add(panel, BorderLayout.CENTER);
-        frame.add(btnContinuar, BorderLayout.SOUTH);
+        frame.add(new JScrollPane(panelPrincipal));
         frame.revalidate();
+        frame.repaint();
     }
 
     private void mostrarIngresoNombres(int numJugadores) {
