@@ -442,17 +442,42 @@ public class ConsolaGrafica {
     private void mostrarResultadosFinales() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        panel.add(new JLabel("RESULTADOS FINALES", SwingConstants.CENTER));
+        JLabel titulo = new JLabel("RESULTADOS FINALES", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 28));
+        panel.add(titulo);
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        // Obtener y ordenar resultados
         List<Map.Entry<String, Integer>> resultados = new ArrayList<>(mago.getPuntuaciones().entrySet());
         resultados.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
+        // Determinar ganador
+        String ganador = resultados.get(0).getKey();
+
+        // Mostrar ganador
+        JLabel lblGanador = new JLabel("¡GANADOR: " + ganador + "!");
+        lblGanador.setFont(new Font("Arial", Font.BOLD, 26));
+        lblGanador.setForeground(new Color(0, 120, 0)); // Verde
+        panel.add(lblGanador);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Mostrar puntuaciones
+        Font fuenteResultados = new Font("Arial", Font.BOLD, 24);
         for (Map.Entry<String, Integer> entry : resultados) {
-            panel.add(new JLabel(entry.getKey() + ": " + entry.getValue() + " puntos"));
+            JLabel lbl = new JLabel(entry.getKey() + ": " + entry.getValue() + " puntos");
+            lbl.setFont(fuenteResultados);
+            panel.add(lbl);
         }
 
-        JOptionPane.showMessageDialog(frame, panel, "Juego Terminado", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(
+                frame,
+                panel,
+                "El Mago de las Palabras | FIN DEL JUEGO",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
         frame.dispose();
         new ConsolaGrafica();
     }
