@@ -15,6 +15,8 @@ public class ConsolaGrafica {
     private JLabel lblJugador;
     private JLabel lblRonda;
 
+    private final Font FUENTE_BOTONES = new Font("Arial", Font.BOLD, 30);
+
     public ConsolaGrafica() {
         crearPantallaInicial();
     }
@@ -54,6 +56,29 @@ public class ConsolaGrafica {
         frame.add(backgroundLabel, BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setPreferredSize(new Dimension(220, 70));
+        boton.setFont(FUENTE_BOTONES);
+        boton.setBackground(new Color(251, 181, 45));
+        boton.setForeground(Color.WHITE);
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        return boton;
+    }
+
+    private void confirmarSalida() {
+        int opcion = JOptionPane.showConfirmDialog(
+                frame,
+                "¿Quieres salir del juego?",
+                "Salir",
+                JOptionPane.YES_NO_OPTION
+        );
+        if (opcion == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
     }
 
     private void mostrarConfiguracionJugadores() {
