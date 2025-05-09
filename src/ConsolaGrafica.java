@@ -390,9 +390,10 @@ public class ConsolaGrafica {
     private void actualizarLetras() {
         letrasPanel.removeAll();
         for (Character letra : mago.getLetrasActuales()) {
-            JLabel lbl = new JLabel(String.valueOf(letra));
-            lbl.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-            lbl.setFont(new Font("Arial", Font.BOLD, 24));
+            JLabel lbl = new JLabel(String.valueOf(letra), SwingConstants.CENTER);
+            lbl.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+            lbl.setFont(new Font("Arial", Font.BOLD, 22));
+            lbl.setPreferredSize(new Dimension(50, 50));
             letrasPanel.add(lbl);
         }
         letrasPanel.revalidate();
