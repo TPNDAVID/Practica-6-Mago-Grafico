@@ -486,22 +486,20 @@ public class ConsolaGrafica {
         infoArea.append(mensaje + "\n");
     }
 
-    private void añadirAlDiccionario(ActionEvent e) {
-        if (palabraTemporal != null && !palabraTemporal.isEmpty()) {
-            int confirm = JOptionPane.showConfirmDialog(
-                    frame,
-                    "¿Deseas añadir '" + palabraTemporal + "' al diccionario?",
-                    "Confirmación",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                mago.getDiccionario().añadirPalabra(palabraTemporal);
-                actualizarInfo("Palabra '" + palabraTemporal + "' añadida al diccionario");
-                btnAnadir.setEnabled(false);
-                palabraTemporal = null;
-            }
-        }
-    }
-
-
+    // METODO AUN POR IMPLEMENTAR
+    //private void añadirAlDiccionario(ActionEvent e) {
+    //    if (palabraTemporal != null && !palabraTemporal.isEmpty()) {
+    //        int confirm = JOptionPane.showConfirmDialog(
+    //                frame,
+    //                "¿Deseas añadir '" + palabraTemporal + "' al diccionario?",
+    //                "Confirmación",
+    //                JOptionPane.YES_NO_OPTION);
+    //
+    //        if (confirm == JOptionPane.YES_OPTION) {
+    //            mago.getDiccionario().añadirPalabra(palabraTemporal);
+    //            actualizarInfo("Palabra '" + palabraTemporal + "' añadida al diccionario");
+    //            btnAnadir.setEnabled(false);
+    //            palabraTemporal = null;
+    //        }
+    //    }
 }
