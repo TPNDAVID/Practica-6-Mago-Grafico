@@ -154,9 +154,9 @@ public class Mago {
         String fuenteConsonantes = (modoDeJuego == 2) ? consonantesExpertas : consonantes;
         while (letras.size() < cantidad) {
             char c = fuenteConsonantes.charAt(random.nextInt(fuenteConsonantes.length()));
-
             letras.add(c);
         }
+
         return letras;
     }
 }
