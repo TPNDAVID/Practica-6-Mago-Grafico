@@ -14,31 +14,45 @@ public class ConsolaGrafica {
     private JPanel letrasPanel;
     private JLabel lblJugador;
     private JLabel lblRonda;
-    private JButton btnAnadir;
-    private String palabraTemporal;
 
     public ConsolaGrafica() {
         crearPantallaInicial();
     }
 
     private void crearPantallaInicial() {
-        frame = new JFrame("Mago de Palabras");
+        frame = new JFrame("El Mago de las Palabras");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(600, 500);
+        frame.setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Imagen del fondo
+        JLabel backgroundLabel = new JLabel(new ImageIcon("src/MAGOIMAGEN.png"));
+        backgroundLabel.setLayout(new BorderLayout());
 
-        JLabel titulo = new JLabel("MAGO DE PALABRAS", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 24));
-        panel.add(titulo, BorderLayout.NORTH);
+        // Panel para botones
+        JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.Y_AXIS));
+        panelBotones.setOpaque(false);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(240, 0, 0, 0));
 
-        JButton btnIniciar = new JButton("Iniciar Juego");
-        btnIniciar.setPreferredSize(new Dimension(40, 40));
+        // Botones
+        JButton btnIniciar = crearBoton("Jugar");
         btnIniciar.addActionListener(e -> mostrarConfiguracionJugadores());
 
-        panel.add(btnIniciar, BorderLayout.CENTER);
-        frame.add(panel);
+        JButton btnSalir = crearBoton("Salir");
+        btnSalir.addActionListener(e -> confirmarSalida());
+
+        // Centrado y espaciado
+        btnIniciar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelBotones.add(btnIniciar);
+        panelBotones.add(Box.createRigidArea(new Dimension(0, 6)));
+        panelBotones.add(btnSalir);
+
+        // Ensamblado final
+        backgroundLabel.add(panelBotones, BorderLayout.CENTER);
+        frame.add(backgroundLabel, BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
