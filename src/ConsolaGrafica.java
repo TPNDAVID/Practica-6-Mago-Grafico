@@ -189,22 +189,75 @@ public class ConsolaGrafica {
     }
 
     private void mostrarIngresoNombres(int numJugadores) {
-        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Panel principal
+        JPanel panelPrincipal = new JPanel();
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
+        JLabel lblTitulo = new JLabel("INGRESO DE JUGADORES", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 28));
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelPrincipal.add(lblTitulo);
+        panelPrincipal.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // Panel para jugadores
+        JPanel panelJugadores = new JPanel();
+        panelJugadores.setLayout(new BoxLayout(panelJugadores, BoxLayout.Y_AXIS));
+        panelJugadores.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Campos para cada jugador
         JTextField[] camposJugadores = new JTextField[numJugadores];
         for (int i = 0; i < numJugadores; i++) {
-            panel.add(new JLabel("Jugador " + (i + 1) + ":"));
+            JPanel panelJugador = new JPanel();
+            panelJugador.setLayout(new BoxLayout(panelJugador, BoxLayout.X_AXIS));
+            panelJugador.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panelJugador.setMaximumSize(new Dimension(450, 60)); // Ajuste de ancho
+            panelJugador.setOpaque(false);
+
+            JLabel iconoJugador = new JLabel("🧙");  // Emoji de mago
+            iconoJugador.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+            iconoJugador.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+            JLabel lblJugador = new JLabel("Jugador " + (i + 1) + ":");
+            lblJugador.setFont(new Font("Arial", Font.BOLD, 22));
+            lblJugador.setPreferredSize(new Dimension(120, 30));
+
             camposJugadores[i] = new JTextField();
-            panel.add(camposJugadores[i]);
+            camposJugadores[i].setFont(new Font("Arial", Font.PLAIN, 20));
+            camposJugadores[i].setHorizontalAlignment(JTextField.CENTER);
+            camposJugadores[i].setMaximumSize(new Dimension(200, 35));
+            camposJugadores[i].setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(150, 150, 150)),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            ));
+
+            panelJugador.add(iconoJugador);
+            panelJugador.add(lblJugador);
+            panelJugador.add(Box.createRigidArea(new Dimension(10, 0)));
+            panelJugador.add(camposJugadores[i]);
+
+            panelJugadores.add(panelJugador);
+            panelJugadores.add(Box.createRigidArea(new Dimension(0, 15)));
         }
 
-        JButton btnIniciar = new JButton("Iniciar Juego");
+        // Botón empezar
+        JButton btnIniciar = new JButton("EMPEZAR JUEGO");
+        btnIniciar.setFont(new Font("Arial", Font.BOLD, 22));
+        btnIniciar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnIniciar.setMaximumSize(new Dimension(250, 50));
+        btnIniciar.setBackground(new Color(251, 181, 45));
+        btnIniciar.setForeground(Color.WHITE);
+        btnIniciar.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        btnIniciar.setFocusPainted(false);
+
         btnIniciar.addActionListener(e -> {
             jugadores = new ArrayList<>();
             for (JTextField campo : camposJugadores) {
                 if (campo.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Todos los jugadores deben tener nombre");
+                    JOptionPane.showMessageDialog(frame,
+                            "Todos los jugadores deben tener nombre",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 jugadores.add(campo.getText().trim());
@@ -212,10 +265,14 @@ public class ConsolaGrafica {
             iniciarJuego();
         });
 
+        panelPrincipal.add(panelJugadores);
+        panelPrincipal.add(Box.createRigidArea(new Dimension(0, 30)));
+        panelPrincipal.add(btnIniciar);
+
         frame.getContentPane().removeAll();
-        frame.add(panel, BorderLayout.CENTER);
-        frame.add(btnIniciar, BorderLayout.SOUTH);
+        frame.add(new JScrollPane(panelPrincipal));
         frame.revalidate();
+        frame.repaint();
     }
 
     private void iniciarJuego() {
