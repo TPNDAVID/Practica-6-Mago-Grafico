@@ -293,10 +293,10 @@ public class ConsolaGrafica {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 
-        lblRonda = new JLabel("RONDA " + mago.getRondaActual() + "/3");
+        lblRonda = new JLabel("Ronda " + mago.getRondaActual() + "/3");
         lblRonda.setFont(new Font("Arial", Font.BOLD, 16));
 
-        lblJugador = new JLabel("TURNO DE: " + mago.getJugadorActual().toUpperCase());
+        lblJugador = new JLabel("Turno de " + mago.getJugadorActual().toUpperCase());
         lblJugador.setFont(new Font("Arial", Font.BOLD, 16));
 
         topPanel.add(Box.createHorizontalGlue());
@@ -328,13 +328,13 @@ public class ConsolaGrafica {
         inputField = new JTextField();
         inputField.setFont(new Font("Arial", Font.PLAIN, 20));
         inputField.setHorizontalAlignment(JTextField.CENTER);
-        inputField.setMaximumSize(new Dimension(500, 40)); // Tamaño fijo
-        inputField.setPreferredSize(new Dimension(500, 40)); // Evita que se expanda
+        inputField.setMaximumSize(new Dimension(500, 40));
+        inputField.setPreferredSize(new Dimension(500, 40));
 
         JPanel inputWrapper = new JPanel();
         inputWrapper.setLayout(new BoxLayout(inputWrapper, BoxLayout.X_AXIS));
         inputWrapper.add(Box.createHorizontalGlue());
-        inputField.setMaximumSize(new Dimension(500, 40)); // Doble restricción
+        inputField.setMaximumSize(new Dimension(500, 40));
         inputWrapper.add(inputField);
         inputWrapper.add(Box.createHorizontalGlue());
 
@@ -426,6 +426,7 @@ public class ConsolaGrafica {
         String mensaje = mago.getJugadorActual() + " escribió '" + palabra + "' y es una palabra ";
         if (resultado.valida) {
             mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
+            historialArea.append(palabra.toUpperCase() + " (+" + resultado.puntos + " pts)\n");
         } else {
             mensaje += "INVÁLIDA (" + resultado.mensaje + ", " + resultado.puntos + " puntos)";
         }
