@@ -14,7 +14,7 @@ public class Diccionario {
         }
     }
 
-    // Método para añadir palabras
+    // Metodo para añadir palabras
     public synchronized void añadirPalabra(String palabra) {
         String palabraUpper = palabra.toUpperCase().trim();
         if (!palabras.containsKey(palabraUpper)) {

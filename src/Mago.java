@@ -30,7 +30,7 @@ public class Mago {
         prepararNuevaRonda();
     }
 
-    // Método nuevo para añadir palabras al diccionario
+    // Metodo nuevo para añadir palabras al diccionario
     public boolean añadirPalabraAlDiccionario(String palabra) {
         if (palabra == null || palabra.trim().isEmpty()) {
             return false;
@@ -51,17 +51,17 @@ public class Mago {
         return true;
     }
 
-    // Método para obtener la última palabra inválida
+    // Metodo para obtener la última palabra inválida
     public String getUltimaPalabraInvalida() {
         return ultimaPalabraInvalida;
     }
 
-    // Método para acceder al diccionario
+    // Metodo para acceder al diccionario
     public Diccionario getDiccionario() {
         return diccionario;
     }
 
-    // Modificación del método procesarPalabra
+    // Modificación del metodo procesarPalabra
     public ResultadoPalabra procesarPalabra(String jugador, String palabraInput) {
         if (!jugador.equals(getJugadorActual())) {
             return new ResultadoPalabra(false, "No es tu turno", 0);

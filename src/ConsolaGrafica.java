@@ -253,10 +253,6 @@ public class ConsolaGrafica {
         infoArea.append(mensaje + "\n");
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(ConsolaGrafica::new);
-    }
-
     private void añadirAlDiccionario(ActionEvent e) {
         if (palabraTemporal != null && !palabraTemporal.isEmpty()) {
             int confirm = JOptionPane.showConfirmDialog(
