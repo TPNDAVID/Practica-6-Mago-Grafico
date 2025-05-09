@@ -122,26 +122,15 @@ public class Mago {
     }
 
     private Set<Character> generarLetras(int cantidad) {
-        Random random = new Random();
-        Set<Character> letras = new HashSet<>();
+        Random random = new Random(System.nanoTime());
+        Set<Character> letras = new LinkedHashSet<>();
         String vocalesBasicas = "AEIOU";
         String vocalesAcentuadas = "ÁÉÍÓ";
         String consonantes = "BCDFGHJKLMNPRST";
         String consonantesDificiles = "VWXYZ";
-        String consonantesExpertas = "BCDFGHJKLMNPQRSTVWXYZ";
 
         for (int i = 0; i < 4; i++) {
             letras.add(vocalesBasicas.charAt(random.nextInt(vocalesBasicas.length())));
-        }
-
-        if (modoDeJuego == 1) {
-            letras.add(consonantesDificiles.charAt(random.nextInt(consonantesDificiles.length())));
-            if (random.nextDouble() <= 0.10) {
-                letras.add('W');
-                letras.add('X');
-                letras.add('Y');
-                letras.add('Z');
-            }
         }
 
         if (modoDeJuego == 2) {
@@ -151,12 +140,14 @@ public class Mago {
             }
         }
 
-        String fuenteConsonantes = (modoDeJuego == 2) ? consonantesExpertas : consonantes;
+        String fuenteConsonantes = (modoDeJuego == 1) ? consonantes : consonantes + consonantesDificiles;
         while (letras.size() < cantidad) {
             char c = fuenteConsonantes.charAt(random.nextInt(fuenteConsonantes.length()));
             letras.add(c);
         }
 
-        return letras;
+        List<Character> letrasMezcladas = new ArrayList<>(letras);
+        Collections.shuffle(letrasMezcladas, random);
+        return new LinkedHashSet<>(letrasMezcladas);
     }
 }
