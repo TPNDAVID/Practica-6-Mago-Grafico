@@ -461,17 +461,17 @@ public class ConsolaGrafica {
         JLabel lblGanador;
         if (hayEmpate) {
             lblGanador = new JLabel("HUBO EMPATE (omg)");
-            lblGanador.setForeground(new Color(0, 0, 200)); // Azul para destacar empate
+            lblGanador.setForeground(new Color(16, 16, 197));
         } else {
             String ganador = resultados.get(0).getKey();
             lblGanador = new JLabel("¡GANADOR: " + ganador + "!");
-            lblGanador.setForeground(new Color(0, 120, 0)); // Verde
+            lblGanador.setForeground(new Color(0, 120, 0));
         }
         lblGanador.setFont(new Font("Arial", Font.BOLD, 26));
         panel.add(lblGanador);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Mostrar puntuaciones (igual que antes)
+        // Mostrar puntuaciones
         Font fuenteResultados = new Font("Arial", Font.BOLD, 24);
         for (Map.Entry<String, Integer> entry : resultados) {
             JLabel lbl = new JLabel(entry.getKey() + ": " + entry.getValue() + " puntos");
