@@ -283,54 +283,104 @@ public class ConsolaGrafica {
     private void mostrarPantallaJuego() {
         frame.getContentPane().removeAll();
 
+        // Panel principal
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 20, 30));
 
-        // Panel superior
-        JPanel topPanel = new JPanel(new FlowLayout());
-        lblRonda = new JLabel("Ronda: " + mago.getRondaActual() + "/3");
-        lblJugador = new JLabel("Turno de: " + mago.getJugadorActual());
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+
+        lblRonda = new JLabel("RONDA " + mago.getRondaActual() + "/3");
+        lblRonda.setFont(new Font("Arial", Font.BOLD, 16));
+        lblRonda.setForeground(new Color(0, 0, 0));
+
+        lblJugador = new JLabel("TURNO DE: " + mago.getJugadorActual().toUpperCase());
+        lblJugador.setFont(new Font("Arial", Font.BOLD, 16));
+        lblJugador.setForeground(new Color(0, 0, 0));
+
+        topPanel.add(Box.createHorizontalGlue());
         topPanel.add(lblRonda);
+        topPanel.add(Box.createRigidArea(new Dimension(40, 0)));
         topPanel.add(lblJugador);
+        topPanel.add(Box.createHorizontalGlue());
+
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
-        JLabel lblLetras = new JLabel("Letras disponibles:");
-        lblLetras.setAlignmentX(Component.CENTER_ALIGNMENT);
-        centerPanel.add(lblLetras);
-
+        // Panel para letras
         letrasPanel = new JPanel();
+        letrasPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         actualizarLetras();
-        centerPanel.add(letrasPanel);
 
-        inputField = new JTextField(20);
-        inputField.setMaximumSize(new Dimension(300, 30));
-        centerPanel.add(inputField);
+        JPanel letrasWrapper = new JPanel();
+        letrasWrapper.setLayout(new BoxLayout(letrasWrapper, BoxLayout.X_AXIS));
+        letrasWrapper.add(Box.createHorizontalGlue());
+        letrasWrapper.add(letrasPanel);
+        letrasWrapper.add(Box.createHorizontalGlue());
 
-        JPanel buttonPanel = new JPanel();
-        JButton btnEnviar = new JButton("Enviar palabra");
+        centerPanel.add(letrasWrapper);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        inputField = new JTextField();
+        inputField.setFont(new Font("Arial", Font.PLAIN, 20));
+        inputField.setHorizontalAlignment(JTextField.CENTER);
+        inputField.setMaximumSize(new Dimension(500, 40)); // Tamaño fijo
+        inputField.setPreferredSize(new Dimension(500, 40)); // Evita que se expanda
+
+        JPanel inputWrapper = new JPanel();
+        inputWrapper.setLayout(new BoxLayout(inputWrapper, BoxLayout.X_AXIS));
+        inputWrapper.add(Box.createHorizontalGlue());
+        inputField.setMaximumSize(new Dimension(500, 40)); // Doble restricción
+        inputWrapper.add(inputField);
+        inputWrapper.add(Box.createHorizontalGlue());
+
+        centerPanel.add(inputWrapper);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Botones para enviar la palabra y de pasar turno
+        JButton btnEnviar = new JButton("ENVIAR PALABRA");
+        btnEnviar.setFont(new Font("Arial", Font.BOLD, 20));
+        btnEnviar.setBackground(new Color(70, 130, 200));
+        btnEnviar.setForeground(Color.WHITE);
+        btnEnviar.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        btnEnviar.setFocusPainted(false);
         btnEnviar.addActionListener(this::procesarPalabra);
 
-        JButton btnPasar = new JButton("Pasar turno");
+        JButton btnPasar = new JButton("PASAR TURNO");
+        btnPasar.setFont(new Font("Arial", Font.BOLD, 20));
+        btnPasar.setBackground(new Color(200, 70, 80));
+        btnPasar.setForeground(Color.WHITE);
+        btnPasar.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        btnPasar.setFocusPainted(false);
         btnPasar.addActionListener(e -> pasarTurno());
 
-        JButton btnAnadir = new JButton("Añadir al diccionario");
-
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(btnEnviar);
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         buttonPanel.add(btnPasar);
-        buttonPanel.add(btnAnadir);
+        buttonPanel.add(Box.createHorizontalGlue());
 
-        centerPanel.add(buttonPanel);
+        JPanel buttonContainer = new JPanel(new BorderLayout());
+        buttonContainer.add(buttonPanel, BorderLayout.CENTER);
+        buttonContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0)); // 30px abajo
 
+        centerPanel.add(buttonContainer);
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Panel inferior
-        infoArea = new JTextArea(8, 30);
+        infoArea = new JTextArea(8, 40);
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 18));
         infoArea.setEditable(false);
-        mainPanel.add(new JScrollPane(infoArea), BorderLayout.SOUTH);
+        infoArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JScrollPane scrollPane = new JScrollPane(infoArea);
+        scrollPane.setBorder(null);
+
+        mainPanel.add(scrollPane, BorderLayout.SOUTH);
 
         frame.add(mainPanel);
         frame.revalidate();
