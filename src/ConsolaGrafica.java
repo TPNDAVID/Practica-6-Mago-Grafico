@@ -14,6 +14,8 @@ public class ConsolaGrafica {
     private JPanel letrasPanel;
     private JLabel lblJugador;
     private JLabel lblRonda;
+    private JButton btnAnadir;
+    private String palabraTemporal;
 
     public ConsolaGrafica() {
         crearPantallaInicial();
@@ -152,8 +154,12 @@ public class ConsolaGrafica {
         JButton btnPasar = new JButton("Pasar turno");
         btnPasar.addActionListener(e -> pasarTurno());
 
+        JButton btnAnadir = new JButton("Añadir al diccionario");
+
         buttonPanel.add(btnEnviar);
         buttonPanel.add(btnPasar);
+        buttonPanel.add(btnAnadir);
+
         centerPanel.add(buttonPanel);
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
@@ -194,6 +200,11 @@ public class ConsolaGrafica {
             mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
         } else {
             mensaje += "INVÁLIDA (" + resultado.mensaje + ", " + resultado.puntos + " puntos)";
+            // Activar botón de añadir solo si la palabra no existe
+            if (resultado.mensaje.equals("Palabra no válida")) {
+                btnAnadir.setEnabled(true);
+                palabraTemporal = palabra; // Guardamos la palabra para posible añadido
+            }
         }
         actualizarInfo(mensaje);
 
@@ -245,4 +256,23 @@ public class ConsolaGrafica {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ConsolaGrafica::new);
     }
+
+    private void añadirAlDiccionario(ActionEvent e) {
+        if (palabraTemporal != null && !palabraTemporal.isEmpty()) {
+            int confirm = JOptionPane.showConfirmDialog(
+                    frame,
+                    "¿Deseas añadir '" + palabraTemporal + "' al diccionario?",
+                    "Confirmación",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                mago.getDiccionario().añadirPalabra(palabraTemporal);
+                actualizarInfo("Palabra '" + palabraTemporal + "' añadida al diccionario");
+                btnAnadir.setEnabled(false);
+                palabraTemporal = null;
+            }
+        }
+    }
+
+
 }

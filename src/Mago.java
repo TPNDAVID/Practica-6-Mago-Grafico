@@ -10,12 +10,13 @@ public class Mago {
     private Set<String> palabrasUsadas = new HashSet<>();
     private int jugadorActual = 0;
     private int rondaActual = 1;
+    private String ultimaPalabraInvalida; // Nueva variable para guardar la última palabra inválida
 
     public Mago(List<String> jugadores, int modoDeJuego) {
         this.jugadores = new ArrayList<>(jugadores);
         this.modoDeJuego = modoDeJuego;
         this.puntajeJugador = new HashMap<>();
-        this.diccionario = new Diccionario(modoDeJuego);
+        this.diccionario = new Diccionario(modoDeJuego, "src/Diccionario.txt"); // Modificado para pasar el nombre del archivo
         this.letrasActuales = new HashSet<>();
 
         try {
@@ -29,6 +30,71 @@ public class Mago {
         prepararNuevaRonda();
     }
 
+    // Método nuevo para añadir palabras al diccionario
+    public boolean añadirPalabraAlDiccionario(String palabra) {
+        if (palabra == null || palabra.trim().isEmpty()) {
+            return false;
+        }
+
+        // Verificar que la palabra no existe ya
+        if (diccionario.contienePalabra(palabra, modoDeJuego)) {
+            return false;
+        }
+
+        // Verificar que usa letras válidas
+        if (!letrasValidas(palabra)) {
+            return false;
+        }
+
+        // Añadir la palabra
+        diccionario.añadirPalabra(palabra);
+        return true;
+    }
+
+    // Método para obtener la última palabra inválida
+    public String getUltimaPalabraInvalida() {
+        return ultimaPalabraInvalida;
+    }
+
+    // Método para acceder al diccionario
+    public Diccionario getDiccionario() {
+        return diccionario;
+    }
+
+    // Modificación del método procesarPalabra
+    public ResultadoPalabra procesarPalabra(String jugador, String palabraInput) {
+        if (!jugador.equals(getJugadorActual())) {
+            return new ResultadoPalabra(false, "No es tu turno", 0);
+        }
+
+        String palabra = palabraInput.toUpperCase();
+        ultimaPalabraInvalida = null; // Resetear la última palabra inválida
+
+        if (palabrasUsadas.contains(palabra)) {
+            return new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0);
+        }
+
+        if (!letrasValidas(palabra)) {
+            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
+            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+            return new ResultadoPalabra(false, "Letras no válidas", penalizacion);
+        }
+
+        if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
+            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
+            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+            ultimaPalabraInvalida = palabra; // Guardar la palabra inválida
+            return new ResultadoPalabra(false, "Palabra no válida", penalizacion);
+        }
+
+        palabrasUsadas.add(palabra);
+        int puntos = diccionario.obtenerPuntos(palabra);
+        puntajeJugador.merge(jugador, puntos, Integer::sum);
+
+        return new ResultadoPalabra(true, "Palabra válida", puntos);
+    }
+
+    // Resto de los métodos permanecen igual...
     public Set<Character> getLetrasActuales() {
         return Collections.unmodifiableSet(letrasActuales);
     }
@@ -56,36 +122,6 @@ public class Mago {
 
     public void iniciarJuego() {
         prepararNuevaRonda();
-    }
-
-    public ResultadoPalabra procesarPalabra(String jugador, String palabraInput) {
-        if (!jugador.equals(getJugadorActual())) {
-            return new ResultadoPalabra(false, "No es tu turno", 0);
-        }
-
-        String palabra = palabraInput.toUpperCase();
-
-        if (palabrasUsadas.contains(palabra)) {
-            return new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0);
-        }
-
-        if (!letrasValidas(palabra)) {
-            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
-            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            return new ResultadoPalabra(false, "Letras no válidas", penalizacion);
-        }
-
-        if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
-            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
-            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            return new ResultadoPalabra(false, "Palabra no válida", penalizacion);
-        }
-
-        palabrasUsadas.add(palabra);
-        int puntos = diccionario.obtenerPuntos(palabra);
-        puntajeJugador.merge(jugador, puntos, Integer::sum);
-
-        return new ResultadoPalabra(true, "Palabra válida", puntos);
     }
 
     public void pasarTurno() {
@@ -158,9 +194,9 @@ public class Mago {
         String fuenteConsonantes = (modoDeJuego == 2) ? consonantesExpertas : consonantes;
         while (letras.size() < cantidad) {
             char c = fuenteConsonantes.charAt(random.nextInt(fuenteConsonantes.length()));
+
             letras.add(c);
         }
-
         return letras;
     }
 }
