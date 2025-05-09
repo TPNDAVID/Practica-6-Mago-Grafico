@@ -409,16 +409,11 @@ public class ConsolaGrafica {
 
         Mago.ResultadoPalabra resultado = mago.procesarPalabra(mago.getJugadorActual(), palabra);
 
-        String mensaje = mago.getJugadorActual() + " escribió: '" + palabra + "' - ";
+        String mensaje = mago.getJugadorActual() + " escribió '" + palabra + "' y es una palabra ";
         if (resultado.valida) {
             mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
         } else {
             mensaje += "INVÁLIDA (" + resultado.mensaje + ", " + resultado.puntos + " puntos)";
-            // Activar botón de añadir solo si la palabra no existe
-            if (resultado.mensaje.equals("Palabra no válida")) {
-                btnAnadir.setEnabled(true);
-                palabraTemporal = palabra; // Guardamos la palabra para posible añadido
-            }
         }
         actualizarInfo(mensaje);
 
@@ -426,9 +421,8 @@ public class ConsolaGrafica {
         actualizarInfo("Puntuaciones: " + mago.getPuntuaciones());
         actualizarLetras();
 
-        // Actualizar información del turno
-        lblJugador.setText("Turno de: " + mago.getJugadorActual());
-        lblRonda.setText("Ronda: " + mago.getRondaActual() + "/3");
+        lblJugador.setText("Turno de " + mago.getJugadorActual());
+        lblRonda.setText("Ronda " + mago.getRondaActual() + "/3");
     }
 
     private void pasarTurno() {
