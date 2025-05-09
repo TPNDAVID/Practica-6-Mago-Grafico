@@ -427,14 +427,14 @@ public class ConsolaGrafica {
 
     private void pasarTurno() {
         mago.pasarTurno();
-        actualizarInfo(mago.getJugadorActual() + " ha pasado su turno");
+        actualizarInfo("Ahora es turno de " + mago.getJugadorActual() + " ya que el jugador actual pasó turno");
 
         if (mago.esFinalDelJuego()) {
             mostrarResultadosFinales();
         } else {
             actualizarLetras();
-            lblJugador.setText("Turno de: " + mago.getJugadorActual());
-            lblRonda.setText("Ronda: " + mago.getRondaActual() + "/3");
+            lblJugador.setText("Turno de " + mago.getJugadorActual());
+            lblRonda.setText("Ronda " + mago.getRondaActual() + "/3");
             inputField.setText("");
         }
     }
