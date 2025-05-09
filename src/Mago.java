@@ -113,8 +113,14 @@ public class Mago {
     }
 
     private boolean letrasValidas(String palabra) {
-        for (char letra : palabra.toCharArray()) {
-            if (!letrasActuales.contains(Character.toUpperCase(letra))) {
+        Set<Character> letrasDisponibles = getLetrasActuales();
+        Iterator<Character> it = palabra.toUpperCase()
+                .chars()
+                .mapToObj(c -> (char) c)
+                .iterator();
+
+        while (it.hasNext()) {
+            if (!letrasDisponibles.contains(it.next())) {
                 return false;
             }
         }
