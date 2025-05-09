@@ -14,6 +14,7 @@ public class ConsolaGrafica {
     private JPanel letrasPanel;
     private JLabel lblJugador;
     private JLabel lblRonda;
+    private JTextArea historialArea;
 
     private final Font FUENTE_BOTONES = new Font("Arial", Font.BOLD, 30);
 
@@ -287,17 +288,16 @@ public class ConsolaGrafica {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 20, 30));
 
+        // Panel superior (ronda y jugador)
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 
         lblRonda = new JLabel("RONDA " + mago.getRondaActual() + "/3");
         lblRonda.setFont(new Font("Arial", Font.BOLD, 16));
-        lblRonda.setForeground(new Color(0, 0, 0));
 
         lblJugador = new JLabel("TURNO DE: " + mago.getJugadorActual().toUpperCase());
         lblJugador.setFont(new Font("Arial", Font.BOLD, 16));
-        lblJugador.setForeground(new Color(0, 0, 0));
 
         topPanel.add(Box.createHorizontalGlue());
         topPanel.add(lblRonda);
@@ -307,6 +307,7 @@ public class ConsolaGrafica {
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
+        // Panel central (letras y entrada)
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -367,20 +368,33 @@ public class ConsolaGrafica {
 
         JPanel buttonContainer = new JPanel(new BorderLayout());
         buttonContainer.add(buttonPanel, BorderLayout.CENTER);
-        buttonContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0)); // 30px abajo
+        buttonContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
         centerPanel.add(buttonContainer);
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
+        // Panel dividido (info + historial)
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(0.6); // 60% para info, 40% para historial
+
+        // Área de información
         infoArea = new JTextArea(8, 40);
         infoArea.setFont(new Font("Arial", Font.PLAIN, 18));
         infoArea.setEditable(false);
-        infoArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JScrollPane infoScroll = new JScrollPane(infoArea);
+        infoScroll.setBorder(BorderFactory.createTitledBorder("Información del Juego"));
 
-        JScrollPane scrollPane = new JScrollPane(infoArea);
-        scrollPane.setBorder(null);
+        // Historial
+        historialArea = new JTextArea(5, 40);
+        historialArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        historialArea.setEditable(false);
+        historialArea.setForeground(new Color(0, 100, 0)); // Verde oscuro
+        JScrollPane historialScroll = new JScrollPane(historialArea);
+        historialScroll.setBorder(BorderFactory.createTitledBorder("Historial de palabras"));
 
-        mainPanel.add(scrollPane, BorderLayout.SOUTH);
+        splitPane.setTopComponent(infoScroll);
+        splitPane.setBottomComponent(historialScroll);
+        mainPanel.add(splitPane, BorderLayout.SOUTH);
 
         frame.add(mainPanel);
         frame.revalidate();
