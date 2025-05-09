@@ -453,17 +453,25 @@ public class ConsolaGrafica {
         List<Map.Entry<String, Integer>> resultados = new ArrayList<>(mago.getPuntuaciones().entrySet());
         resultados.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
-        // Determinar ganador
-        String ganador = resultados.get(0).getKey();
+        // Saber si hay empate
+        boolean hayEmpate = resultados.size() > 1 &&
+                resultados.get(0).getValue().equals(resultados.get(1).getValue());
 
-        // Mostrar ganador
-        JLabel lblGanador = new JLabel("¡GANADOR: " + ganador + "!");
+        // Mostrar ganador o empate
+        JLabel lblGanador;
+        if (hayEmpate) {
+            lblGanador = new JLabel("HUBO EMPATE (omg)");
+            lblGanador.setForeground(new Color(0, 0, 200)); // Azul para destacar empate
+        } else {
+            String ganador = resultados.get(0).getKey();
+            lblGanador = new JLabel("¡GANADOR: " + ganador + "!");
+            lblGanador.setForeground(new Color(0, 120, 0)); // Verde
+        }
         lblGanador.setFont(new Font("Arial", Font.BOLD, 26));
-        lblGanador.setForeground(new Color(0, 120, 0)); // Verde
         panel.add(lblGanador);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Mostrar puntuaciones
+        // Mostrar puntuaciones (igual que antes)
         Font fuenteResultados = new Font("Arial", Font.BOLD, 24);
         for (Map.Entry<String, Integer> entry : resultados) {
             JLabel lbl = new JLabel(entry.getKey() + ": " + entry.getValue() + " puntos");
