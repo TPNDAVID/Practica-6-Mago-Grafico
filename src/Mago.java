@@ -60,30 +60,36 @@ public class Mago {
             return new ResultadoPalabra(false, "No es tu turno", 0, false);
         }
 
-        String palabra = palabraInput.toUpperCase();
-        ResultadoPalabra resultado;
+        String palabra = palabraInput.toUpperCase().trim();
 
-        if (palabrasUsadas.contains(palabra)) {
-            resultado = new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0, false);
-        }
-        else if (!letrasValidas(palabra)) {
+        if (palabra.isEmpty()) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
             puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            resultado = new ResultadoPalabra(false, "Letras no válidas", penalizacion, false);
-        }
-        else if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
-            // Cambio clave: Ahora indicamos que se puede sugerir añadir la palabra
-            resultado = new ResultadoPalabra(false, "Palabra no válida", 0, true);
-        }
-        else {
-            palabrasUsadas.add(palabra);
-            int puntos = diccionario.obtenerPuntos(palabra);
-            puntajeJugador.merge(jugador, puntos, Integer::sum);
-            resultado = new ResultadoPalabra(true, "Palabra válida", puntos, false);
+            return new ResultadoPalabra(false, "No se ingresó palabra", penalizacion, false);
         }
 
-        //siguienteTurno();
-        return resultado;
+        if (palabrasUsadas.contains(palabra)) {
+            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
+            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+            return new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", penalizacion, false);
+        }
+
+        if (!letrasValidas(palabra)) {
+            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
+            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+            return new ResultadoPalabra(false, "Letras no válidas", penalizacion, false);
+        }
+
+        if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
+            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
+            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+            return new ResultadoPalabra(false, "Palabra no válida", penalizacion, true);
+        }
+
+        palabrasUsadas.add(palabra);
+        int puntos = diccionario.obtenerPuntos(palabra);
+        puntajeJugador.merge(jugador, puntos, Integer::sum);
+        return new ResultadoPalabra(true, "Palabra válida", puntos, false);
     }
 
     public boolean pasarTurno() {
