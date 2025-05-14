@@ -422,22 +422,69 @@ public class ConsolaGrafica {
         }
 
         Mago.ResultadoPalabra resultado = mago.procesarPalabra(mago.getJugadorActual(), palabra);
+        String jugadorActualOriginal = mago.getJugadorActual(); // Guardar jugador actual real
 
-        String mensaje = mago.getJugadorActual() + " escribió '" + palabra + "' y es una palabra ";
+        // Manejar el caso donde se puede sugerir añadir la palabra al diccionario
+        boolean exito = false;
+        if (resultado.sugerirAñadir) {
+            int opcion = JOptionPane.showConfirmDialog(
+                    frame,
+                    "¿Deseas agregar '" + palabra + "' al diccionario?\n¡Ganarás sus puntos si es aceptada!",
+                    "Palabra no reconocida",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (opcion == JOptionPane.YES_OPTION) {
+                exito = mago.agregarPalabraAlDiccionario(palabra, mago.getJugadorActual());
+                if (exito) {
+                    // Actualizar interfaz para palabra añadida
+                    historialArea.append("[NUEVA] " + palabra.toUpperCase() + " (+"
+                            + mago.getPuntuaciones().get(mago.getJugadorActual()) + " pts)\n");
+                    actualizarInfo("¡Palabra añadida! +" + mago.getPuntuaciones().get(mago.getJugadorActual())
+                            + " puntos para " + mago.getJugadorActual());
+                    mago.siguienteTurno();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "No se pudo agregar la palabra. Letras inválidas o ya existe.");
+                }
+            } else {
+                // Aplicar penalización normal si elige no agregar
+                int penalizacion = (mago.modoDeJuego == 1) ? -5 : -10;
+                mago.getPuntuaciones().merge(mago.getJugadorActual(), penalizacion, Integer::sum);
+                actualizarInfo("Penalización aplicada: " + penalizacion + " puntos");
+            }
+        }
+
+        // Mensaje principal de resultado
+        String mensaje = jugadorActualOriginal + " escribió '" + palabra + "' y es una palabra ";
         if (resultado.valida) {
             mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
-            historialArea.append(palabra.toUpperCase() + " (+" + resultado.puntos + " pts)\n");
+            historialArea.append(jugadorActualOriginal.toUpperCase() + ": " + palabra.toUpperCase() +
+                    " (+" + resultado.puntos + " pts)\n");
         } else {
-            mensaje += "INVÁLIDA (" + resultado.mensaje + ", " + resultado.puntos + " puntos)";
+            mensaje += "INVÁLIDA (" + resultado.mensaje + ")";
         }
+
+        // Avanzar turno solo si no fue una palabra añadida
+        if (!resultado.sugerirAñadir || !exito) {
+            mago.siguienteTurno();
+        }
+
+
         actualizarInfo(mensaje);
 
+        // Actualizar componentes de la interfaz
         inputField.setText("");
-        actualizarInfo("Puntuaciones: " + mago.getPuntuaciones());
+        actualizarInfo("Puntuaciones actuales: " + mago.getPuntuaciones());
         actualizarLetras();
 
+        // Actualizar turno y ronda
         lblJugador.setText("Turno de " + mago.getJugadorActual());
         lblRonda.setText("Ronda " + mago.getRondaActual() + "/3");
+
+        // Verificar si el juego terminó después de esta jugada
+        if (mago.esFinalDelJuego()) {
+            mostrarResultadosFinales();
+        }
     }
 
     private void pasarTurno() {
@@ -506,6 +553,8 @@ public class ConsolaGrafica {
     }
 
     private void actualizarInfo(String mensaje) {
-        infoArea.append(mensaje + "\n");
+        // Modificar para mostrar mejor las nuevas palabras
+        infoArea.append("> " + mensaje + "\n");
+        infoArea.setCaretPosition(infoArea.getDocument().getLength());
     }
 }

@@ -4,7 +4,7 @@ import java.util.*;
 public class Mago {
     private Diccionario diccionario;
     private HashMap<String, Integer> puntajeJugador;
-    private int modoDeJuego;
+    public int modoDeJuego;
     private List<String> jugadores;
     private Set<Character> letrasActuales;
     private Set<String> palabrasUsadas = new HashSet<>();
@@ -57,31 +57,32 @@ public class Mago {
 
     public ResultadoPalabra procesarPalabra(String jugador, String palabraInput) {
         if (!jugador.equals(getJugadorActual())) {
-            return new ResultadoPalabra(false, "No es tu turno", 0);
+            return new ResultadoPalabra(false, "No es tu turno", 0, false);
         }
 
         String palabra = palabraInput.toUpperCase();
         ResultadoPalabra resultado;
 
         if (palabrasUsadas.contains(palabra)) {
-            resultado = new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0);
-        } else if (!letrasValidas(palabra)) {
+            resultado = new ResultadoPalabra(false, "Esta palabra ya se usó en esta ronda", 0, false);
+        }
+        else if (!letrasValidas(palabra)) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
             puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            resultado = new ResultadoPalabra(false, "Letras no válidas", penalizacion);
-        } else if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
-            int penalizacion = (modoDeJuego == 1) ? -5 : -10;
-            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            resultado = new ResultadoPalabra(false, "Palabra no válida", penalizacion);
-        } else {
+            resultado = new ResultadoPalabra(false, "Letras no válidas", penalizacion, false);
+        }
+        else if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
+            // Cambio clave: Ahora indicamos que se puede sugerir añadir la palabra
+            resultado = new ResultadoPalabra(false, "Palabra no válida", 0, true);
+        }
+        else {
             palabrasUsadas.add(palabra);
             int puntos = diccionario.obtenerPuntos(palabra);
             puntajeJugador.merge(jugador, puntos, Integer::sum);
-            resultado = new ResultadoPalabra(true, "Palabra válida", puntos);
+            resultado = new ResultadoPalabra(true, "Palabra válida", puntos, false);
         }
 
-        siguienteTurno();
-
+        //siguienteTurno();
         return resultado;
     }
 
@@ -101,7 +102,7 @@ public class Mago {
         return false;
     }
 
-    private void siguienteTurno() {
+    public void siguienteTurno() {
         jugadorActual = (jugadorActual + 1) % jugadores.size();
     }
 
@@ -109,11 +110,14 @@ public class Mago {
         public final boolean valida;
         public final String mensaje;
         public final int puntos;
+        public final boolean sugerirAñadir; // Nuevo campo
 
-        public ResultadoPalabra(boolean valida, String mensaje, int puntos) {
+        // Constructor modificado
+        public ResultadoPalabra(boolean valida, String mensaje, int puntos, boolean sugerirAñadir) {
             this.valida = valida;
             this.mensaje = mensaje;
             this.puntos = puntos;
+            this.sugerirAñadir = sugerirAñadir;
         }
     }
 
@@ -161,4 +165,27 @@ public class Mago {
         Collections.shuffle(letrasMezcladas, random);
         return new LinkedHashSet<>(letrasMezcladas);
     }
+
+    public boolean agregarPalabraAlDiccionario(String palabra, String jugador) {
+        try {
+            if (letrasValidas(palabra) && !diccionario.contienePalabra(palabra, modoDeJuego)) {
+                int puntos = calcularPuntos(palabra); // <<< Usar método local no del diccionario
+                diccionario.addWord(palabra);
+                puntajeJugador.merge(jugador, puntos, Integer::sum);
+                palabrasUsadas.add(palabra.toUpperCase());
+                return true;
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar la palabra: " + e.getMessage());
+        }
+        return false;
+    }
+    private int calcularPuntos(String palabra) {
+        String vocales = modoDeJuego == 1 ? "AEIOU" : "AEIOUÁÉÍÓÚ";
+        long numVocales = palabra.toUpperCase().chars()
+                .filter(c -> vocales.indexOf(c) != -1)
+                .count();
+        return (int) (numVocales * 5 + (palabra.length() - numVocales) * 3);
+    }
+
 }
