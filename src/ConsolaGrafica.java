@@ -443,11 +443,9 @@ public class ConsolaGrafica {
                     historialArea.append("[NUEVA] " + palabra.toUpperCase() + " (+" + puntosObtenidos + " pts)\n");
                     actualizarInfo("¡Palabra añadida! +" + puntosObtenidos + " puntos para " + jugadorActual);
 
-                    // Aplicar manualmente los puntos por nueva palabra
                     mago.getPuntuaciones().merge(jugadorActual, puntosObtenidos, Integer::sum);
                 }
             } else {
-                // Aplicar penalización solo si no se añadió la palabra
                 mago.aplicarPenalizacion(jugadorActual, resultado.puntos);
                 actualizarInfo("Penalización aplicada: " + resultado.puntos + " puntos a " + jugadorActual);
             }
@@ -488,7 +486,14 @@ public class ConsolaGrafica {
 
 
     private void pasarTurno() {
-        mago.pasarTurno();
+
+        boolean cambioDeRonda = mago.pasarTurno();
+
+        if (cambioDeRonda) {
+            historialArea.setText("");
+        }
+
+        //mago.pasarTurno();
         actualizarInfo("Ahora es turno de " + mago.getJugadorActual() + " ya que el jugador actual pasó turno");
 
         if (mago.esFinalDelJuego()) {
@@ -553,7 +558,6 @@ public class ConsolaGrafica {
     }
 
     private void actualizarInfo(String mensaje) {
-        // Modificar para mostrar mejor las nuevas palabras
         infoArea.append("> " + mensaje + "\n");
         infoArea.setCaretPosition(infoArea.getDocument().getLength());
     }
