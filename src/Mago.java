@@ -180,7 +180,7 @@ public class Mago {
         }
         return false;
     }
-    private int calcularPuntos(String palabra) {
+    public int calcularPuntos(String palabra) {
         String vocales = modoDeJuego == 1 ? "AEIOU" : "AEIOUÁÉÍÓÚ";
         long numVocales = palabra.toUpperCase().chars()
                 .filter(c -> vocales.indexOf(c) != -1)

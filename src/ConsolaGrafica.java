@@ -421,67 +421,70 @@ public class ConsolaGrafica {
             return;
         }
 
-        Mago.ResultadoPalabra resultado = mago.procesarPalabra(mago.getJugadorActual(), palabra);
-        String jugadorActualOriginal = mago.getJugadorActual(); // Guardar jugador actual real
+        String jugadorActualOriginal = mago.getJugadorActual();
+        int puntuacionOriginal = mago.getPuntuaciones().get(jugadorActualOriginal);
+        boolean palabraFueAñadida = false;
+        int puntosObtenidos = 0;
 
-        // Manejar el caso donde se puede sugerir añadir la palabra al diccionario
-        boolean exito = false;
+        Mago.ResultadoPalabra resultado = mago.procesarPalabra(jugadorActualOriginal, palabra);
+
         if (resultado.sugerirAñadir) {
+            int puntosPotenciales = mago.calcularPuntos(palabra);
             int opcion = JOptionPane.showConfirmDialog(
                     frame,
-                    "¿Deseas agregar '" + palabra + "' al diccionario?\n¡Ganarás sus puntos si es aceptada!",
+                    "¿Deseas agregar '" + palabra + "' al diccionario?\n¡Obtendrás " + puntosPotenciales + " puntos!",
                     "Palabra no reconocida",
                     JOptionPane.YES_NO_OPTION
             );
 
             if (opcion == JOptionPane.YES_OPTION) {
-                exito = mago.agregarPalabraAlDiccionario(palabra, mago.getJugadorActual());
-                if (exito) {
-                    // Actualizar interfaz para palabra añadida
-                    historialArea.append("[NUEVA] " + palabra.toUpperCase() + " (+"
-                            + mago.getPuntuaciones().get(mago.getJugadorActual()) + " pts)\n");
-                    actualizarInfo("¡Palabra añadida! +" + mago.getPuntuaciones().get(mago.getJugadorActual())
-                            + " puntos para " + mago.getJugadorActual());
-                    mago.siguienteTurno();
-                } else {
-                    JOptionPane.showMessageDialog(frame, "No se pudo agregar la palabra. Letras inválidas o ya existe.");
+                palabraFueAñadida = mago.agregarPalabraAlDiccionario(palabra, jugadorActualOriginal);
+
+                if (palabraFueAñadida) {
+                    // Calcular puntos basado solo en la palabra nueva
+                    puntosObtenidos = mago.calcularPuntos(palabra);
+
+                    historialArea.append("[NUEVA] " + palabra.toUpperCase() + " (+" + puntosObtenidos + " pts)\n");
+                    actualizarInfo("¡Palabra añadida! +" + puntosObtenidos + " puntos para " + jugadorActualOriginal);
+
+                    // Actualizar puntuación manualmente
+                    mago.getPuntuaciones().merge(jugadorActualOriginal, puntosObtenidos, Integer::sum);
                 }
             } else {
-                // Aplicar penalización normal si elige no agregar
+                // Aplicar penalización normal
                 int penalizacion = (mago.modoDeJuego == 1) ? -5 : -10;
-                mago.getPuntuaciones().merge(mago.getJugadorActual(), penalizacion, Integer::sum);
+                mago.getPuntuaciones().merge(jugadorActualOriginal, penalizacion, Integer::sum);
                 actualizarInfo("Penalización aplicada: " + penalizacion + " puntos");
             }
         }
 
-        // Mensaje principal de resultado
-        String mensaje = jugadorActualOriginal + " escribió '" + palabra + "' y es una palabra ";
-        if (resultado.valida) {
-            mensaje += "VÁLIDA (+" + resultado.puntos + " puntos)";
-            historialArea.append(jugadorActualOriginal.toUpperCase() + ": " + palabra.toUpperCase() +
-                    " (+" + resultado.puntos + " pts)\n");
+        String mensaje;
+        if (palabraFueAñadida) {
+            mensaje = jugadorActualOriginal + " añadió '" + palabra + "' al diccionario (+" + puntosObtenidos + " pts)";
         } else {
-            mensaje += "INVÁLIDA (" + resultado.mensaje + ")";
+            mensaje = jugadorActualOriginal + " escribió '" + palabra + "': ";
+            mensaje += resultado.valida ?
+                    "VÁLIDA (+" + resultado.puntos + " pts)" :
+                    "INVÁLIDA (" + resultado.mensaje + ")";
+
+            if (resultado.valida) {
+                historialArea.append(jugadorActualOriginal.toUpperCase() + ": " + palabra.toUpperCase() +
+                        " (+" + resultado.puntos + " pts)\n");
+            }
         }
 
-        // Avanzar turno solo si no fue una palabra añadida
-        if (!resultado.sugerirAñadir || !exito) {
-            mago.siguienteTurno();
-        }
+        // Avanzar turno después de todas las operaciones
+        mago.siguienteTurno();
 
-
-        actualizarInfo(mensaje);
-
-        // Actualizar componentes de la interfaz
+        // Actualizar componentes
         inputField.setText("");
+        actualizarInfo(mensaje);
         actualizarInfo("Puntuaciones actuales: " + mago.getPuntuaciones());
         actualizarLetras();
 
-        // Actualizar turno y ronda
         lblJugador.setText("Turno de " + mago.getJugadorActual());
         lblRonda.setText("Ronda " + mago.getRondaActual() + "/3");
 
-        // Verificar si el juego terminó después de esta jugada
         if (mago.esFinalDelJuego()) {
             mostrarResultadosFinales();
         }
