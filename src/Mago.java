@@ -46,6 +46,10 @@ public class Mago {
         return rondaActual;
     }
 
+    public int getModoDeJuego() {
+        return this.modoDeJuego;
+    }
+
     public boolean esFinalDelJuego() {
         return rondaActual > 3;
     }
@@ -194,4 +198,7 @@ public class Mago {
         return (int) (numVocales * 5 + (palabra.length() - numVocales) * 3);
     }
 
+    public void aplicarPenalizacion(String jugador, int penalizacion) {
+        puntajeJugador.merge(jugador, penalizacion, Integer::sum);
+    }
 }

@@ -451,10 +451,11 @@ public class ConsolaGrafica {
                     mago.getPuntuaciones().merge(jugadorActualOriginal, puntosObtenidos, Integer::sum);
                 }
             } else {
-                // Aplicar penalización normal
-                int penalizacion = (mago.modoDeJuego == 1) ? -5 : -10;
-                mago.getPuntuaciones().merge(jugadorActualOriginal, penalizacion, Integer::sum);
-                actualizarInfo("Penalización aplicada: " + penalizacion + " puntos");
+                // Aplicar penalización al JUGADOR ORIGINAL
+                int modoActual = mago.modoDeJuego; // Obtener modo desde Mago
+                int penalizacion = (modoActual == 1) ? -5 : -10;
+                mago.aplicarPenalizacion(jugadorActualOriginal, penalizacion);
+                actualizarInfo("Penalización aplicada  a " + jugadorActualOriginal);
             }
         }
 
