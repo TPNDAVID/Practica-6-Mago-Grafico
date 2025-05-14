@@ -46,8 +46,6 @@ public class Mago {
         return rondaActual;
     }
 
-
-
     public boolean esFinalDelJuego() {
         return rondaActual > 3;
     }
@@ -82,7 +80,6 @@ public class Mago {
             return new ResultadoPalabra(false, "Letras no válidas", penalizacion, false);
         }
 
-        // Si no está en el diccionario, NO penalizamos aún. Solo sugerimos.
         if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
             return new ResultadoPalabra(false, "Palabra no válida", penalizacion, true); // Penalización se aplicará si el jugador rechaza añadir
@@ -120,7 +117,7 @@ public class Mago {
         public final boolean valida;
         public final String mensaje;
         public final int puntos;
-        public final boolean sugerirAñadir; // Nuevo campo
+        public final boolean sugerirAñadir;
 
         // Constructor modificado
         public ResultadoPalabra(boolean valida, String mensaje, int puntos, boolean sugerirAñadir) {
@@ -181,7 +178,7 @@ public class Mago {
             if (letrasValidas(palabra) && !diccionario.contienePalabra(palabra, modoDeJuego)) {
                 int puntos = calcularPuntos(palabra);
                 diccionario.addWord(palabra);
-                puntajeJugador.merge(jugador, puntos, Integer::sum); // Solo suma puntos
+                puntajeJugador.merge(jugador, puntos, Integer::sum);
                 palabrasUsadas.add(palabra.toUpperCase());
                 return true;
             }
@@ -196,9 +193,6 @@ public class Mago {
                 .filter(c -> vocales.indexOf(c) != -1)
                 .count();
         return (int) (numVocales * 5 + (palabra.length() - numVocales) * 3);
-    }
-    public int getModoDeJuego() {
-        return this.modoDeJuego;
     }
 
     public void aplicarPenalizacion(String jugador, int penalizacion) {

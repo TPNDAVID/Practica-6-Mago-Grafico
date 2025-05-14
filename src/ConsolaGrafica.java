@@ -375,7 +375,7 @@ public class ConsolaGrafica {
 
         // Panel dividido (info + historial)
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setResizeWeight(0.6); // 60% para info, 40% para historial
+        splitPane.setResizeWeight(0.6);
 
         // Área de información
         infoArea = new JTextArea(8, 40);
@@ -388,7 +388,7 @@ public class ConsolaGrafica {
         historialArea = new JTextArea(5, 40);
         historialArea.setFont(new Font("Arial", Font.PLAIN, 16));
         historialArea.setEditable(false);
-        historialArea.setForeground(new Color(0, 100, 0)); // Verde oscuro
+        historialArea.setForeground(new Color(0, 100, 0));
         JScrollPane historialScroll = new JScrollPane(historialArea);
         historialScroll.setBorder(BorderFactory.createTitledBorder("Historial de palabras"));
 
