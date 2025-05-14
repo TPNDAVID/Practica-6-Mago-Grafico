@@ -46,9 +46,7 @@ public class Mago {
         return rondaActual;
     }
 
-    public int getModoDeJuego() {
-        return this.modoDeJuego;
-    }
+
 
     public boolean esFinalDelJuego() {
         return rondaActual > 3;
@@ -84,17 +82,19 @@ public class Mago {
             return new ResultadoPalabra(false, "Letras no válidas", penalizacion, false);
         }
 
+        // Si no está en el diccionario, NO penalizamos aún. Solo sugerimos.
         if (!diccionario.contienePalabra(palabra, modoDeJuego)) {
             int penalizacion = (modoDeJuego == 1) ? -5 : -10;
-            puntajeJugador.merge(jugador, penalizacion, Integer::sum);
-            return new ResultadoPalabra(false, "Palabra no válida", penalizacion, true);
+            return new ResultadoPalabra(false, "Palabra no válida", penalizacion, true); // Penalización se aplicará si el jugador rechaza añadir
         }
 
+        // Palabra válida
         palabrasUsadas.add(palabra);
         int puntos = diccionario.obtenerPuntos(palabra);
         puntajeJugador.merge(jugador, puntos, Integer::sum);
         return new ResultadoPalabra(true, "Palabra válida", puntos, false);
     }
+
 
     public boolean pasarTurno() {
         jugadoresQuePasaron.add(jugadores.get(jugadorActual));
@@ -179,9 +179,9 @@ public class Mago {
     public boolean agregarPalabraAlDiccionario(String palabra, String jugador) {
         try {
             if (letrasValidas(palabra) && !diccionario.contienePalabra(palabra, modoDeJuego)) {
-                int puntos = calcularPuntos(palabra); // <<< Usar método local no del diccionario
+                int puntos = calcularPuntos(palabra);
                 diccionario.addWord(palabra);
-                puntajeJugador.merge(jugador, puntos, Integer::sum);
+                puntajeJugador.merge(jugador, puntos, Integer::sum); // Solo suma puntos
                 palabrasUsadas.add(palabra.toUpperCase());
                 return true;
             }
@@ -197,8 +197,12 @@ public class Mago {
                 .count();
         return (int) (numVocales * 5 + (palabra.length() - numVocales) * 3);
     }
+    public int getModoDeJuego() {
+        return this.modoDeJuego;
+    }
 
     public void aplicarPenalizacion(String jugador, int penalizacion) {
         puntajeJugador.merge(jugador, penalizacion, Integer::sum);
     }
+
 }

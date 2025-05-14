@@ -421,13 +421,12 @@ public class ConsolaGrafica {
             return;
         }
 
-        String jugadorActualOriginal = mago.getJugadorActual();
-        int puntuacionOriginal = mago.getPuntuaciones().get(jugadorActualOriginal);
+        String jugadorActual = mago.getJugadorActual();
+        Mago.ResultadoPalabra resultado = mago.procesarPalabra(jugadorActual, palabra);
         boolean palabraFueAñadida = false;
-        int puntosObtenidos = 0;
+        int puntosObtenidos = resultado.puntos;
 
-        Mago.ResultadoPalabra resultado = mago.procesarPalabra(jugadorActualOriginal, palabra);
-
+        // Si se sugiere añadir al diccionario
         if (resultado.sugerirAñadir) {
             int puntosPotenciales = mago.calcularPuntos(palabra);
             int opcion = JOptionPane.showConfirmDialog(
@@ -438,46 +437,42 @@ public class ConsolaGrafica {
             );
 
             if (opcion == JOptionPane.YES_OPTION) {
-                palabraFueAñadida = mago.agregarPalabraAlDiccionario(palabra, jugadorActualOriginal);
-
+                palabraFueAñadida = mago.agregarPalabraAlDiccionario(palabra, jugadorActual);
                 if (palabraFueAñadida) {
-                    // Calcular puntos basado solo en la palabra nueva
-                    puntosObtenidos = mago.calcularPuntos(palabra);
-
+                    puntosObtenidos = puntosPotenciales;
                     historialArea.append("[NUEVA] " + palabra.toUpperCase() + " (+" + puntosObtenidos + " pts)\n");
-                    actualizarInfo("¡Palabra añadida! +" + puntosObtenidos + " puntos para " + jugadorActualOriginal);
+                    actualizarInfo("¡Palabra añadida! +" + puntosObtenidos + " puntos para " + jugadorActual);
 
-                    // Actualizar puntuación manualmente
-                    mago.getPuntuaciones().merge(jugadorActualOriginal, puntosObtenidos, Integer::sum);
+                    // Aplicar manualmente los puntos por nueva palabra
+                    mago.getPuntuaciones().merge(jugadorActual, puntosObtenidos, Integer::sum);
                 }
             } else {
-                // Aplicar penalización al JUGADOR ORIGINAL
-                int modoActual = mago.modoDeJuego; // Obtener modo desde Mago
-                int penalizacion = (modoActual == 1) ? -5 : -10;
-                mago.aplicarPenalizacion(jugadorActualOriginal, penalizacion);
-                actualizarInfo("Penalización aplicada  a " + jugadorActualOriginal);
+                // Aplicar penalización solo si no se añadió la palabra
+                mago.aplicarPenalizacion(jugadorActual, resultado.puntos);
+                actualizarInfo("Penalización aplicada: " + resultado.puntos + " puntos a " + jugadorActual);
             }
         }
 
+        // Generar mensaje de resultado
         String mensaje;
         if (palabraFueAñadida) {
-            mensaje = jugadorActualOriginal + " añadió '" + palabra + "' al diccionario (+" + puntosObtenidos + " pts)";
+            mensaje = jugadorActual + " añadió '" + palabra + "' al diccionario (+" + puntosObtenidos + " pts)";
         } else {
-            mensaje = jugadorActualOriginal + " escribió '" + palabra + "': ";
-            mensaje += resultado.valida ?
-                    "VÁLIDA (+" + resultado.puntos + " pts)" :
-                    "INVÁLIDA (" + resultado.mensaje + ")";
+            mensaje = jugadorActual + " escribió '" + palabra + "': ";
+            mensaje += resultado.valida
+                    ? "VÁLIDA (+" + resultado.puntos + " pts)"
+                    : "INVÁLIDA (" + resultado.mensaje + ")";
 
             if (resultado.valida) {
-                historialArea.append(jugadorActualOriginal.toUpperCase() + ": " + palabra.toUpperCase() +
+                historialArea.append(jugadorActual.toUpperCase() + ": " + palabra.toUpperCase() +
                         " (+" + resultado.puntos + " pts)\n");
             }
         }
 
-        // Avanzar turno después de todas las operaciones
+        // Avanzar al siguiente turno
         mago.siguienteTurno();
 
-        // Actualizar componentes
+        // Actualizar la interfaz
         inputField.setText("");
         actualizarInfo(mensaje);
         actualizarInfo("Puntuaciones actuales: " + mago.getPuntuaciones());
@@ -490,6 +485,7 @@ public class ConsolaGrafica {
             mostrarResultadosFinales();
         }
     }
+
 
     private void pasarTurno() {
         mago.pasarTurno();
