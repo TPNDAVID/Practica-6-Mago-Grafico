@@ -40,4 +40,25 @@ public class Diccionario {
     public int obtenerPuntos(String palabra) {
         return palabras.getOrDefault(palabra.toUpperCase(), 0);
     }
+
+    public void addWord(String palabra) throws IOException {
+        String palabraUpper = palabra.toUpperCase().trim();
+        if (!palabras.containsKey(palabraUpper)) {
+            int puntos = calcularPuntos(palabraUpper);
+            palabras.put(palabraUpper, puntos);
+            saveToFile("src/diccionariopalabrasmago.txt", palabraUpper);
+        }
+    }
+
+    private void saveToFile(String filename, String nuevaPalabra) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
+            writer.newLine();
+            writer.write(nuevaPalabra);
+        }
+    }
+
+
+
+
+
 }

@@ -215,7 +215,7 @@ public class ConsolaGrafica {
             panelJugador.setMaximumSize(new Dimension(450, 60)); // Ajuste de ancho
             panelJugador.setOpaque(false);
 
-            JLabel iconoJugador = new JLabel("🧙");  // Emoji de mago
+            JLabel iconoJugador = new JLabel("🧙");
             iconoJugador.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
             iconoJugador.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
